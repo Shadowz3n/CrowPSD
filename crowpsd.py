@@ -1,7 +1,7 @@
 from psd_tools import PSDImage
 from random import randint
 
-psd = PSDImage.load('brandshop_site_localizador_v2_mobile.psd')
+psd = PSDImage.load('psd_name.psd')
 psd_to_img = psd.as_PIL()
 psd_to_img.save('my_image.png')
 
@@ -17,7 +17,7 @@ def getInsideGroup(if_group):
         for k in if_group.layers:
             crow_id     = crow_id+1
             thisId      = "crow_psd_"+str(crow_id)
-            thisCSS     += "#"+thisId+"{position:absolute;width:"+str(k.bbox.width)+"px;height:"+str(k.bbox.height)+"px;margin-left:"+str(k.bbox.x2)+"px;margin-top:"+str(k.bbox.y2)+"px}\n"
+            thisCSS     += "#"+thisId+"{position:absolute;width:"+str(k.bbox.width)+"px;height:"+str(k.bbox.height)+"px;margin-left:"+str(k.bbox.x2 - k.bbox.width)+"px;margin-top:"+str(k.bbox.y2 - k.bbox.height)+"px}\n"
             if 'layer_count' not in str(k):
                 thisText    = k.text_data.text if k.text_data else ""
             else:
@@ -29,7 +29,7 @@ def getInsideGroup(if_group):
 for i in psd.layers:
     crow_id     = crow_id+1
     thisId      = "crow_psd_"+str(crow_id)
-    thisCSS     += "#"+thisId+"{position:absolute;width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px;margin-left:"+str(i.bbox.x2)+"px;margin-top:"+str(i.bbox.y2)+"px}\n"
+    thisCSS     += "#"+thisId+"{position:absolute;width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px;margin-left:"+str(i.bbox.x2 - i.bbox.width)+"px;margin-top:"+str(i.bbox.y2 - i.bbox.height)+"px}\n"
     if 'layer_count' not in str(i):
         thisText    = i.text_data.text if i.text_data else ""
     else:
