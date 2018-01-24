@@ -16,8 +16,8 @@ def getInsideGroup(if_group):
     if 'layer_count' in str(if_group):
         for k in if_group.layers:
             crow_id     = crow_id+1
-            thisId      = "#crow_psd_"+str(crow_id)
-            thisCSS     += thisId+"{position:absolute;width:"+str(k.bbox.width)+"px;height:"+str(k.bbox.height)+"px}"
+            thisId      = "crow_psd_"+str(crow_id)
+            thisCSS     += "#"+thisId+"{position:absolute;width:"+str(k.bbox.width)+"px;height:"+str(k.bbox.height)+"px;margin-left:"+str(k.bbox.x2)+"px;margin-top:"+str(k.bbox.y2)+"px}\n"
             if 'layer_count' not in str(k):
                 thisText    = k.text_data.text if k.text_data else ""
             else:
@@ -28,8 +28,8 @@ def getInsideGroup(if_group):
 
 for i in psd.layers:
     crow_id     = crow_id+1
-    thisId      = "#crow_psd_"+str(crow_id)
-    thisCSS     += thisId+"{position:absolute;width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px}"
+    thisId      = "crow_psd_"+str(crow_id)
+    thisCSS     += "#"+thisId+"{position:absolute;width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px;margin-left:"+str(i.bbox.x2)+"px;margin-top:"+str(i.bbox.y2)+"px}\n"
     if 'layer_count' not in str(i):
         thisText    = i.text_data.text if i.text_data else ""
     else:
@@ -40,13 +40,17 @@ for i in psd.layers:
 saveHTML        = """<!DOCTYPE html>
                     <html>
                         <head>
-                            <style>%s</style>
+                            <style>html,body{margin:0px;padding:0px}\n.crow_bg{background:url(my_image.png) no-repeat;width:%spx;height:%spx}%s</style>
                         </head>
                         <body>
-                            %s
+                            <div class="crow_bg">
+                                %s
+                            </div>
                         </body>
                     </html>"""
 
-saveHTML        = saveHTML % (thisCSS, toHTML)
+saveHTML        = saveHTML % (psd_to_img.size[0], psd_to_img.size[1], thisCSS, toHTML)
 
-print saveHTML
+file = open("index.html","w+") 
+file.write(saveHTML.encode('utf-8').strip())
+file.close()
