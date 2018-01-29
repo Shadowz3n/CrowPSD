@@ -28,24 +28,25 @@ getOnlyLayers(psd)
 for i in allLayers:
     layerCSS        = ""
     thisText        = ""
+
     # Create all images
     if not i.text_data:
         layer_image = i.as_PIL()
         layer_image.save('assets/img/layer_'+str(i.layer_id)+'.png')
-        layerCSS    += "background-image:url(assets/img/layer_"+str(i.layer_id)+".png);background-repeat:no-repeat"
+        layerCSS    += "background-image:url(assets/img/layer_"+str(i.layer_id)+".png);background-repeat:no-repeat;"
     else:
         thisText    = i.text_data.text
         layerCSS    += ""
 
     # Create 
-    thisCSS         += "#crow_"+str(i.layer_id)+"{"+str(layerCSS)+"position:absolute;width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px;margin-left:"+str(i.bbox.x2 - i.bbox.width)+"px;margin-top:"+str(i.bbox.y2 - i.bbox.height)+"px;border:1px solid red}\n"
-    thisHTML        += "<div id='crow_"+str(i.layer_id)+"'>"+thisText+"</div>"
+    thisCSS         += ".crow_"+str(i.layer_id)+"{"+str(layerCSS)+"position:absolute;z-index:"+str(i.layer_id)+";width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px;margin-left:"+str(i.bbox.x2 - i.bbox.width)+"px;margin-top:"+str(i.bbox.y2 - i.bbox.height)+"px;border:1px solid red}\n"
+    thisHTML        += "<div class='crow_"+str(i.layer_id)+"'>"+thisText+"</div>"
 
 file = open("index.html","w+") 
 file.write((("""<!DOCTYPE html>
                 <html>
                     <head>
-                        <style>html,body{margin:0px;padding:0px}\n.crow_bg{background:url(assets/img/bg.png) no-repeat;position:relative;margin:0px auto;width:%spx;height:%spx}%s</style>
+                        <style>html,body{margin:0px;padding:0px}\n.crow_bg{background-image:url(assets/img/bg.png);overflow:hidden;position:relative;margin:0px auto;width:%spx;height:%spx}%s</style>
                     </head>
                     <body>
                         <div class="crow_bg">
