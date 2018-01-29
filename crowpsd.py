@@ -1,56 +1,56 @@
+#!/usr/bin/python
+#  -*- coding: utf-8 -*-
+
 from psd_tools import PSDImage
-from random import randint
+import os
 
-psd = PSDImage.load('psd_name.psd')
+if not os.path.isdir("assets"): os.mkdir("assets")
+if not os.path.isdir("assets/img"): os.mkdir("assets/img")
+
+psd = PSDImage.load('brandshop_site_localizador_v2_mobile.psd')
 psd_to_img = psd.as_PIL()
-psd_to_img.save('my_image.png')
+psd_to_img.save('assets/img/bg.png')
 
-toHTML  = ""
-thisCSS = ""
-crow_id = 0
+thisHTML    = ""
+thisCSS     = ""
+allLayers   = []
 
-def getInsideGroup(if_group):
-    global toHTML
-    global thisCSS
-    global crow_id
-    if 'layer_count' in str(if_group):
-        for k in if_group.layers:
-            crow_id     = crow_id+1
-            thisId      = "crow_psd_"+str(crow_id)
-            thisCSS     += "#"+thisId+"{position:absolute;width:"+str(k.bbox.width)+"px;height:"+str(k.bbox.height)+"px;margin-left:"+str(k.bbox.x2 - k.bbox.width)+"px;margin-top:"+str(k.bbox.y2 - k.bbox.height)+"px}\n"
-            if 'layer_count' not in str(k):
-                thisText    = k.text_data.text if k.text_data else ""
-            else:
-                thisText    = ""
-            toHTML      += "<div id='"+thisId+"'>"+thisText+"</div>"
-            getInsideGroup(k)
+def getOnlyLayers(thisPSD):
+    global allLayers
+    for i in thisPSD.layers:
+        if "layers" in dir(i):
+            getOnlyLayers(i)
+        else:
+            if i.visible: allLayers.append(i)
 
+getOnlyLayers(psd)
 
-for i in psd.layers:
-    crow_id     = crow_id+1
-    thisId      = "crow_psd_"+str(crow_id)
-    thisCSS     += "#"+thisId+"{position:absolute;width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px;margin-left:"+str(i.bbox.x2 - i.bbox.width)+"px;margin-top:"+str(i.bbox.y2 - i.bbox.height)+"px}\n"
-    if 'layer_count' not in str(i):
-        thisText    = i.text_data.text if i.text_data else ""
+for i in allLayers:
+    layerCSS        = ""
+    thisText        = ""
+    # Create all images
+    if not i.text_data:
+        layer_image = i.as_PIL()
+        layer_image.save('assets/img/layer_'+str(i.layer_id)+'.png')
+        layerCSS    += "background-image:url(assets/img/layer_"+str(i.layer_id)+".png);background-repeat:no-repeat"
     else:
-        thisText    = ""
-    toHTML      += "<div id='"+thisId+"'>"+thisText+"</div>"
-    getInsideGroup(i)
+        thisText    = i.text_data.text
+        layerCSS    += ""
 
-saveHTML        = """<!DOCTYPE html>
-                    <html>
-                        <head>
-                            <style>html,body{margin:0px;padding:0px}\n.crow_bg{background:url(my_image.png) no-repeat;width:%spx;height:%spx}%s</style>
-                        </head>
-                        <body>
-                            <div class="crow_bg">
-                                %s
-                            </div>
-                        </body>
-                    </html>"""
-
-saveHTML        = saveHTML % (psd_to_img.size[0], psd_to_img.size[1], thisCSS, toHTML)
+    # Create 
+    thisCSS         += "#crow_"+str(i.layer_id)+"{"+str(layerCSS)+"position:absolute;width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px;margin-left:"+str(i.bbox.x2 - i.bbox.width)+"px;margin-top:"+str(i.bbox.y2 - i.bbox.height)+"px;border:1px solid red}\n"
+    thisHTML        += "<div id='crow_"+str(i.layer_id)+"'>"+thisText+"</div>"
 
 file = open("index.html","w+") 
-file.write(saveHTML.encode('utf-8').strip())
+file.write((("""<!DOCTYPE html>
+                <html>
+                    <head>
+                        <style>html,body{margin:0px;padding:0px}\n.crow_bg{background:url(assets/img/bg.png) no-repeat;position:relative;margin:0px auto;width:%spx;height:%spx}%s</style>
+                    </head>
+                    <body>
+                        <div class="crow_bg">
+                            %s
+                        </div>
+                    </body>
+                </html>""") % (psd_to_img.size[0], psd_to_img.size[1], thisCSS, thisHTML)).encode('utf-8').strip())
 file.close()
