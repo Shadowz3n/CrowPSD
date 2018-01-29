@@ -33,14 +33,14 @@ for i in allLayers:
     if not i.text_data:
         layer_image = i.as_PIL()
         layer_image.save('assets/img/layer_'+str(i.layer_id)+'.png')
-        layerCSS    += "background-image:url(assets/img/layer_"+str(i.layer_id)+".png);background-repeat:no-repeat;"
+        layerCSS    += """background-image:url(assets/img/layer_%s.png);background-repeat:no-repeat;""" % str(i.layer_id)
     else:
         thisText    = i.text_data.text
         layerCSS    += ""
 
     # Create 
-    thisCSS         += ".crow_"+str(i.layer_id)+"{"+str(layerCSS)+"position:absolute;z-index:"+str(i.layer_id)+";width:"+str(i.bbox.width)+"px;height:"+str(i.bbox.height)+"px;margin-left:"+str(i.bbox.x2 - i.bbox.width)+"px;margin-top:"+str(i.bbox.y2 - i.bbox.height)+"px;border:1px solid red}\n"
-    thisHTML        += "<div class='crow_"+str(i.layer_id)+"'>"+thisText+"</div>"
+    thisCSS         += """.crow_%s{%sposition:absolute;z-index:%s;width:%spx;height:%spx;margin-left:%spx;margin-top:%spx}\n""" % (str(i.layer_id), str(layerCSS), str(i.layer_id), str(i.bbox.width), str(i.bbox.height), str(i.bbox.x2 - i.bbox.width), str(i.bbox.y2 - i.bbox.height))
+    thisHTML        += """<div class='crow_%s'>%s</div>""" % (str(i.layer_id), thisText)
 
 file = open("index.html","w+") 
 file.write((("""<!DOCTYPE html>
